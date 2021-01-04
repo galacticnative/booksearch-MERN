@@ -16,26 +16,26 @@ const resolvers = {
             throw new AuthenticationError('Not logged in');
         },
 
-        // get all users
-        users: async () => {
-            return User.find()
-            .select('-__v -password')
-            .populate('books');
-        },
-        // get a user by username
-        user: async (parent, { username }) => {
-            return User.findOne({ username })
-            .select('-__v -password')
-            .populate('books');
-        },
-        books: async (parent, { title }) => {
-            const params = title ? { title } : {};
-            return Book.find(params).sort({ createdAt: -1 });
-        },
-        // place this inside of the `Query` nested object right after `books` 
-        book: async (parent, { bookId }) => {
-            return Book.findOne({ bookId });
-        },
+        // // get all users
+        // users: async () => {
+        //     return User.find()
+        //     .select('-__v -password')
+        //     .populate('books');
+        // },
+        // // get a user by username
+        // user: async (parent, { username }) => {
+        //     return User.findOne({ username })
+        //     .select('-__v -password')
+        //     .populate('books');
+        // },
+        // books: async (parent, { title }) => {
+        //     const params = title ? { title } : {};
+        //     return Book.find(params).sort({ createdAt: -1 });
+        // },
+        // // place this inside of the `Query` nested object right after `books` 
+        // book: async (parent, { bookId }) => {
+        //     return Book.findOne({ bookId });
+        // },
     },
     Mutation: {
         addUser: async (parent, args) => {
@@ -60,37 +60,33 @@ const resolvers = {
             const token = signToken(user);
             return { token, user };
         },
-        saveBook: async (parent, args, context) => {
+        saveBook: async (parent, { input }, context) => {
             if (context.user) {
-                const book = await Book.create({ ...args, username: context.user.username });
-            
-                await User.findByIdAndUpdate(
+                const updatedUser = await User.findByIdAndUpdate(
                 { _id: context.user._id },
-                { $push: { books: book.bookId } },
+                { $addToSet: { savedBooks: input } },
                 { new: true }
                 );
             
-                return book;
+                return updatedUser;
             }
             
             throw new AuthenticationError('You need to be logged in!');
         },
         removeBook: async (parent, args, context) => {
             if (context.user) {
-                const book = await Book.findByIdAndUpdate( ...args);
-
-                await User.findByIdAndUpdate(
+                const updatedUser = await User.findOneAndUpdate(
                     {_id: context.user._id },
-                    { $pull: { books: book.bookId } },
+                    { $pull: { bookId: args.bookId } },
                     { new: true }
                 );
 
-                return book;
+                return updatedUser;
             }
+            throw new AuthenticationError('You need to be logged in!');
         }
     }
     
 };
-  
   
 module.exports = resolvers;
