@@ -73,11 +73,14 @@ const SearchBooks = () => {
       try {
         //const response = await saveBook(bookToSave, token);
 
-        const { books } = await saveBook({
+        const { data } = await saveBook({
           variables: { input: bookToSave }
         });
-
-        console.log(books);
+        
+        if (error) {
+          throw new Error('Something went wrong!')
+        }
+        console.log(data);
         // const { books } = cache.readQuery({ query: SAVE_BOOK });
         // cache.writeQuery({ 
         //   query: SAVE_BOOK,
@@ -92,29 +95,7 @@ const SearchBooks = () => {
       } catch (err) {
         console.error(err);
       }
-    }
-     
-  
-
-  // const [saveBook, { error }] = useMutation(SAVE_BOOK, {
-  //   update(cache, { data: { saveBook } }) {
-  //     try {
-  //       const { books } = cache.readQuery({ query: SAVE_BOOK });
-  //       cache.writeQuery({
-  //         query: SAVE_BOOK,
-  //         data: { books: [saveBook, ...books] }
-  //       });
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-
-  //     const { me } = cache.readQuery({ query: GET_ME });
-  //     cache.writeQuery({
-  //       query: GET_ME,
-  //       data: { me: { ...me, books: [...me.books, saveBook] } }
-  //     });
-  //   }
-  // })
+    };
 
   return (
     <>
