@@ -15,7 +15,7 @@ After you git clone the repo, if you want to test the app in the local environme
 ## Usage 
 To view the live deployed website, visit the following link:
 
-### https://git.heroku.com/shrouded-reef-94925.git
+### https://shrouded-reef-94925.herokuapp.com/
 
 ![picture](./booksearch.png)
     
